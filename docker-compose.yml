@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  servicio-1:
+    build: ./servicio-1/
+    ports:
+      - 8081:8080
+    depends_on:
+      - mosquitto
+
+  servicio-2:
+    build: ./servicio-2/
+    ports:
+      - 8082:8080
+    depends_on:
+      - mosquitto
+
+  servicio-3:
+    build: ./servicio-3/
+    ports:
+      - 8083:8080
+    depends_on:
+      - influx
+      - mysql
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - 1883:1883
+    volumes: 
+      - ./eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  mysql:
+    image: mysql:8
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=tecnoandina
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+  
+  influx:
+    image: influxdb:alpine
+    volumes:
+      - influxdata:/var/lib/influxdb
+    ports:
+      - 8086:8086
+    environment:
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin2024
+      - DOCKER_INFLUXDB_INIT_ORG=tecnoandina
+      - DOCKER_INFLUXDB_INIT_BUCKET=system
+  
+volumes:
+  mysqldata:
+  influxdata:
